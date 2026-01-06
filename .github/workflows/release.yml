@@ -37,13 +37,13 @@ jobs:
       - name: Build Linux ARM64
         run: |
           cross build --release --target aarch64-unknown-linux-gnu -p gg-server
-          cargo deb --target aarch64-unknown-linux-gnu -p gg-server --no-build -o dist
+          cp target/aarch64-unknown-linux-gnu/release/gg-retro dist/gg-retro_linux_arm64
 
       # Linux ARMv7 (Raspberry Pi 2/3)
       - name: Build Linux ARMv7
         run: |
           cross build --release --target armv7-unknown-linux-gnueabihf -p gg-server
-          cargo deb --target armv7-unknown-linux-gnueabihf -p gg-server --no-build -o dist
+          cp target/armv7-unknown-linux-gnueabihf/release/gg-retro dist/gg-retro_linux_armv7
 
       # Windows 64-bit
       - name: Build Windows 64-bit

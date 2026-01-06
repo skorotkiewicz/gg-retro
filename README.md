@@ -6,6 +6,10 @@
 
 Reimplementacja serwera protokołu Gadu-Gadu 6.0 w języku Rust. Projekt umożliwia uruchomienie własnego serwera kompatybilnego z oryginalnym klientem GG 6.0.
 
+## Demo
+
+[![GG-Retro Demo](docs/video-preview.jpg)](https://youtu.be/wgpId9a4DRE)
+
 ## Funkcje
 
 - Logowanie i rejestracja użytkowników
