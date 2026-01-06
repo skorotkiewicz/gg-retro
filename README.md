@@ -16,7 +16,80 @@ Reimplementacja serwera protokołu Gadu-Gadu 6.0 w języku Rust. Projekt umożli
 - Wysyłanie i odbieranie wiadomości
 - Statusy online/offline/zajęty/niewidoczny
 - Kolejkowanie wiadomości offline
-- Formatowanie tekstu (pogrubieni3
+- Formatowanie tekstu (pogrubienie, kursywa, kolory)
+
+## Pobieranie gotowych wersji
+
+Nie musisz kompilować projektu samodzielnie! Gotowe pliki wykonywalne dla Windowsa, Linuxa i macOS są dostępne na stronie:
+
+**[📥 Pobierz najnowszą wersję](https://github.com/macbury/gg-retro/releases)**
+
+## Szybki start - Windows
+
+**Dla osób nietechnicznych - instrukcja krok po kroku:**
+
+### 1. Pobierz serwer
+
+- Wejdź na [stronę z wydaniami](https://github.com/macbury/gg-retro/releases)
+- Pobierz plik `gg-retro_win64.exe` (dla Windows 64-bit) lub `gg-retro_win32.exe` (dla starszych systemów)
+- Zapisz w dowolnym folderze (np. `C:\gg-retro\`)
+
+### 2. Skonfiguruj nazwę serwera w pliku hosts
+
+**To najważniejszy krok!** Dzięki niemu klient GG będzie wiedział gdzie szukać serwera.
+
+1. Otwórz Notatnik **jako Administrator**:
+   - Wyszukaj "Notatnik" w menu Start
+   - Kliknij prawym → "Uruchom jako administrator"
+
+2. Otwórz plik: `C:\Windows\System32\drivers\etc\hosts`
+   - W Notatniku: Plik → Otwórz
+   - Wpisz ścieżkę: `C:\Windows\System32\drivers\etc\hosts`
+   - Zmień filtr na "Wszystkie pliki (*.*)"
+
+3. Dodaj na końcu pliku:
+   ```
+   127.0.0.1  gg-retro.local
+   ```
+
+4. Zapisz plik (Ctrl+S)
+
+### 3. Uruchom serwer
+
+1. Utwórz plik `config.toml` w folderze z serwerem:
+   ```toml
+   bind = "0.0.0.0"
+   http_port = 80
+   gg_port = 8074
+   db = "./gg.db"
+   hostname = "gg-retro.local"
+   ```
+
+2. Kliknij dwukrotnie `gg-retro_win64.exe`
+   - Jeśli Windows wyświetli ostrzeżenie, kliknij "Więcej informacji" → "Uruchom mimo to"
+   - Serwer uruchomi się w oknie konsoli
+
+**Jeśli port 80 wymaga uprawnień administratora**, zmień `http_port` na `8080` w `config.toml`
+
+### 4. Połącz klienta GG
+
+1. Otwórz przeglądarkę i wejdź na: `http://gg-retro.local` (lub `http://gg-retro.local:8080` jeśli zmieniłeś port)
+
+2. **Pobierz klienta GG:**
+   - Zakładka "Pobierz" → pobierz `gg61.exe`
+
+3. **Spatchuj klienta:**
+   - Zakładka "Patcher"
+   - Wybierz pobrany `gg61.exe`
+   - Adres serwera: `gg-retro.local`
+   - Kliknij "Patchuj plik" → pobierz spatchowany plik
+
+4. **Zarejestruj konto:**
+   - Zakładka "Rejestracja" → zarejestruj nowe konto GG
+
+5. **Uruchom spatchowanego klienta i zaloguj się!** 🎉
+
+**Dla zaawansowanych:** Jeśli masz własną domenę, możesz użyć jej zamiast `gg-retro.local` (max 16 znaków).
 
 ## Wymagania
 
@@ -219,7 +292,7 @@ Dodaj wpisy do pliku hosts:
 
 Użyj wbudowanego patchera na stronie głównej serwera (zakładka "Patcher").
 
-Patcher zamienia domenę `gadu-gadu.pl` na Twoją domenę (max 12 znaków) bezpośrednio w przeglądarce - plik nie jest wysyłany na serwer.
+Patcher zamienia domenę `gadu-gadu.pl` na Twoją domenę (max 16 znaków) bezpośrednio w przeglądarce - plik nie jest wysyłany na serwer.
 
 **Wymagania:**
 - Serwer GG-Retro musi być uruchomiony na porcie 80 (HTTP API)
