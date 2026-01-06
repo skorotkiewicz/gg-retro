@@ -12,20 +12,13 @@ Reimplementacja serwera protokołu Gadu-Gadu 6.0 w języku Rust. Projekt umożli
 - Wysyłanie i odbieranie wiadomości
 - Statusy online/offline/zajęty/niewidoczny
 - Kolejkowanie wiadomości offline
-- Formatowanie tekstu (pogrubienie, kursywa, podkreślenie, kolory)
-- Obsługa listy kontaktów
+- Formatowanie tekstu (pogrubieni3
 
 ## Wymagania
 
 - Rust 1.90+
 - SQLite
 - [Klient Gadu-Gadu 6.0](https://www.dobreprogramy.pl/gadu-gadu-gg,program,windows,6628204058663041)
-
-## Budowanie
-
-```bash
-cargo build --release
-```
 
 ## Testowanie
 

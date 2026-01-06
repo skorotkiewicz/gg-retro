@@ -1,0 +1,17 @@
+# Konfiguracja serwera GG-Retro
+# Zmienne srodowiskowe (GG_*) maja wyzszy priorytet niz ten plik
+
+# Adres IP do nasluchiwania
+bind = "0.0.0.0"
+
+# Port HTTP API (rejestracja, CAPTCHA, discovery)
+http_port = 80
+
+# Port protokolu GG
+gg_port = 8074
+
+# Sciezka do bazy danych SQLite
+db = "/var/lib/gg-retro/gg.db"
+
+# Nazwa hosta serwera (uzywana w URI)
+hostname = "gg-retro.local"

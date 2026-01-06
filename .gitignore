@@ -8,4 +8,6 @@ docs/libgadu/
 docs/miranda-ng/
 docs/kadu/
 .idea/**/*
-config.toml
+/config.toml
+/server/config.toml
+/client/config.toml
