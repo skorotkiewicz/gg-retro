@@ -221,7 +221,22 @@ Użyj wbudowanego patchera na stronie głównej serwera (zakładka "Patcher").
 
 Patcher zamienia domenę `gadu-gadu.pl` na Twoją domenę (max 12 znaków) bezpośrednio w przeglądarce - plik nie jest wysyłany na serwer.
 
-1. Otwórz stronę serwera GG-Retro
+**Wymagania:**
+- Serwer GG-Retro musi być uruchomiony na porcie 80 (HTTP API)
+- Musisz mieć skonfigurowaną domenę wskazującą na serwer
+- Domenę możesz ustawić w:
+  - Pliku `/etc/hosts` (Linux/Mac) lub `C:\Windows\System32\drivers\etc\hosts` (Windows)
+  - Pi-hole (jeśli używasz lokalnego DNS)
+  - Lokalnym serwerze DNS
+
+Przykładowa konfiguracja domeny w `/etc/hosts`:
+```
+192.168.1.100  gg-retro.local
+```
+
+**Patchowanie:**
+
+1. Otwórz stronę serwera GG-Retro (np. `http://gg-retro.local`)
 2. Przejdź do zakładki "Patcher"
 3. Wybierz plik `gg.exe`
 4. Wpisz adres serwera (np. `gg-retro.local`)
