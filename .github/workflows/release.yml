@@ -9,113 +9,136 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-linux-windows:
-    runs-on: ubuntu-latest
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux AMD64 (with Debian package)
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            name: linux-amd64
+            use_cross: true
+            build_deb: true
+            extension: ''
+
+          # Linux ARM64 (Raspberry Pi 3/4/5)
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            name: linux-arm64
+            use_cross: true
+            build_deb: false
+            extension: ''
+
+          # Linux ARMv7 (Raspberry Pi 2/3)
+          - target: armv7-unknown-linux-gnueabihf
+            os: ubuntu-latest
+            name: linux-armv7
+            use_cross: true
+            build_deb: false
+            extension: ''
+
+          # Windows 64-bit
+          - target: x86_64-pc-windows-gnu
+            os: ubuntu-latest
+            name: win64
+            use_cross: true
+            build_deb: false
+            extension: '.exe'
+
+          # Windows 32-bit
+          - target: i686-pc-windows-gnu
+            os: ubuntu-latest
+            name: win32
+            use_cross: true
+            build_deb: false
+            extension: '.exe'
+
+          # macOS Intel
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            name: macos-intel
+            use_cross: false
+            build_deb: false
+            extension: ''
+
+          # macOS Apple Silicon
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            name: macos-arm
+            use_cross: false
+            build_deb: false
+            extension: ''
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      # Install cross for Linux and Windows builds
       - name: Install cross
+        if: matrix.use_cross == true
         run: cargo install cross --git https://github.com/cross-rs/cross
 
+      # Install cargo-deb only for Linux AMD64
       - name: Install cargo-deb
+        if: matrix.build_deb == true
         run: cargo install cargo-deb
 
-      - name: Create dist directory
-        run: mkdir -p dist
-
-      # Linux AMD64
-      - name: Build Linux AMD64
-        run: |
-          cross build --release --target x86_64-unknown-linux-gnu -p gg-server
-          cargo deb --target x86_64-unknown-linux-gnu -p gg-server --no-build -o dist
-          cp target/x86_64-unknown-linux-gnu/release/gg-retro dist/gg-retro_linux_amd64
-
-      # Linux ARM64 (Raspberry Pi 3/4/5)
-      - name: Build Linux ARM64
-        run: |
-          cross build --release --target aarch64-unknown-linux-gnu -p gg-server
-          cp target/aarch64-unknown-linux-gnu/release/gg-retro dist/gg-retro_linux_arm64
-
-      # Linux ARMv7 (Raspberry Pi 2/3)
-      - name: Build Linux ARMv7
-        run: |
-          cross build --release --target armv7-unknown-linux-gnueabihf -p gg-server
-          cp target/armv7-unknown-linux-gnueabihf/release/gg-retro dist/gg-retro_linux_armv7
-
-      # Windows 64-bit
-      - name: Build Windows 64-bit
-        run: |
-          cross build --release --target x86_64-pc-windows-gnu -p gg-server
-          cp target/x86_64-pc-windows-gnu/release/gg-retro.exe dist/gg-retro_win64.exe
-
-      # Windows 32-bit
-      - name: Build Windows 32-bit
-        run: |
-          cross build --release --target i686-pc-windows-gnu -p gg-server
-          cp target/i686-pc-windows-gnu/release/gg-retro.exe dist/gg-retro_win32.exe
-
-      - name: Upload Linux/Windows artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-windows-builds
-          path: dist/*
-
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Add macOS targets
-        run: |
-          rustup target add x86_64-apple-darwin
-          rustup target add aarch64-apple-darwin
+      # Add target for macOS native builds
+      - name: Add target
+        if: matrix.use_cross == false
+        run: rustup target add ${{ matrix.target }}
 
       - name: Create dist directory
         run: mkdir -p dist
 
-      # macOS Intel
-      - name: Build macOS Intel
+      # Build the binary
+      - name: Build ${{ matrix.name }}
         run: |
-          cargo build --release --target x86_64-apple-darwin -p gg-server
-          cp target/x86_64-apple-darwin/release/gg-retro dist/gg-retro_macos_intel
+          if [ "${{ matrix.use_cross }}" == "true" ]; then
+            cross build --release --target ${{ matrix.target }} -p gg-server
+          else
+            cargo build --release --target ${{ matrix.target }} -p gg-server
+          fi
 
-      # macOS Apple Silicon
-      - name: Build macOS Apple Silicon
-        run: |
-          cargo build --release --target aarch64-apple-darwin -p gg-server
-          cp target/aarch64-apple-darwin/release/gg-retro dist/gg-retro_macos_arm
+          # Copy binary with standardized naming
+          cp target/${{ matrix.target }}/release/gg-retro${{ matrix.extension }} dist/gg-retro_${{ matrix.name }}${{ matrix.extension }}
 
-      - name: Upload macOS artifacts
+      # Build Debian package only for Linux AMD64
+      - name: Build Debian package
+        if: matrix.build_deb == true
+        run: cargo deb --target ${{ matrix.target }} -p gg-server --no-build -o dist
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: macos-builds
+          name: build-${{ matrix.name }}
           path: dist/*
+          retention-days: 1
 
   release:
-    needs: [build-linux-windows, build-macos]
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download Linux/Windows artifacts
+      # Download all build artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: linux-windows-builds
-          path: dist
+          path: artifacts
 
-      - name: Download macOS artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: macos-builds
-          path: dist
+      # Consolidate all artifacts into single dist directory
+      - name: Consolidate artifacts
+        run: |
+          mkdir -p dist
+          find artifacts -type f -exec cp {} dist/ \;
 
       - name: List artifacts
         run: ls -la dist/
