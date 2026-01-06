@@ -171,24 +171,6 @@ sudo systemctl enable gg-retro
 | `/var/lib/gg-retro/gg.db` | Baza danych |
 | `journalctl -u gg-retro` | Logi |
 
-### Uruchomienie na Windows
-
-```cmd
-gg-retro_win64.exe
-```
-
-Lub z konfiguracją przez zmienne środowiskowe:
-
-```cmd
-set GG_BIND=0.0.0.0
-set GG_HTTP_PORT=8080
-gg-retro_win64.exe
-```
-
-Plik konfiguracyjny `config.toml` powinien znajdować się w tym samym katalogu co plik `.exe`.
-
-**Uwaga:** Port 80 wymaga uprawnień administratora. Użyj `GG_HTTP_PORT=8080` dla zwykłego użytkownika.
-
 ### Uruchomienie na macOS
 
 ```bash
