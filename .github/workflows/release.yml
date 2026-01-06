@@ -1,0 +1,131 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-linux-windows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Install cargo-deb
+        run: cargo install cargo-deb
+
+      - name: Create dist directory
+        run: mkdir -p dist
+
+      # Linux AMD64
+      - name: Build Linux AMD64
+        run: |
+          cross build --release --target x86_64-unknown-linux-gnu -p gg-server
+          cargo deb --target x86_64-unknown-linux-gnu -p gg-server --no-build -o dist
+          cp target/x86_64-unknown-linux-gnu/release/gg-retro dist/gg-retro_linux_amd64
+
+      # Linux ARM64 (Raspberry Pi 3/4/5)
+      - name: Build Linux ARM64
+        run: |
+          cross build --release --target aarch64-unknown-linux-gnu -p gg-server
+          cargo deb --target aarch64-unknown-linux-gnu -p gg-server --no-build -o dist
+
+      # Linux ARMv7 (Raspberry Pi 2/3)
+      - name: Build Linux ARMv7
+        run: |
+          cross build --release --target armv7-unknown-linux-gnueabihf -p gg-server
+          cargo deb --target armv7-unknown-linux-gnueabihf -p gg-server --no-build -o dist
+
+      # Windows 64-bit
+      - name: Build Windows 64-bit
+        run: |
+          cross build --release --target x86_64-pc-windows-gnu -p gg-server
+          cp target/x86_64-pc-windows-gnu/release/gg-retro.exe dist/gg-retro_win64.exe
+
+      # Windows 32-bit
+      - name: Build Windows 32-bit
+        run: |
+          cross build --release --target i686-pc-windows-gnu -p gg-server
+          cp target/i686-pc-windows-gnu/release/gg-retro.exe dist/gg-retro_win32.exe
+
+      - name: Upload Linux/Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-windows-builds
+          path: dist/*
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Add macOS targets
+        run: |
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
+
+      - name: Create dist directory
+        run: mkdir -p dist
+
+      # macOS Intel
+      - name: Build macOS Intel
+        run: |
+          cargo build --release --target x86_64-apple-darwin -p gg-server
+          cp target/x86_64-apple-darwin/release/gg-retro dist/gg-retro_macos_intel
+
+      # macOS Apple Silicon
+      - name: Build macOS Apple Silicon
+        run: |
+          cargo build --release --target aarch64-apple-darwin -p gg-server
+          cp target/aarch64-apple-darwin/release/gg-retro dist/gg-retro_macos_arm
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-builds
+          path: dist/*
+
+  release:
+    needs: [build-linux-windows, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Linux/Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-windows-builds
+          path: dist
+
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-builds
+          path: dist
+
+      - name: List artifacts
+        run: ls -la dist/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

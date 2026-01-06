@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        # Create gg-retro user if it doesn't exist
+        if ! getent passwd gg-retro >/dev/null; then
+            adduser --system --group --no-create-home --home /var/lib/gg-retro gg-retro
+        fi
+
+        # Create data directory
+        mkdir -p /var/lib/gg-retro
+        chown gg-retro:gg-retro /var/lib/gg-retro
+        chmod 750 /var/lib/gg-retro
+
+        # Reload systemd
+        systemctl daemon-reload
+        ;;
+esac
+
+exit 0

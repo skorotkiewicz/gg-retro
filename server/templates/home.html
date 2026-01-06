@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GG-Retro</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="desktop">
+  <div class="window">
+    <div class="titlebar">
+      <div class="titlebar-text">
+        <div class="titlebar-icon"></div>
+        <span>GG-Retro</span>
+      </div>
+      <div class="titlebar-buttons">
+        <div class="titlebar-button">_</div>
+        <div class="titlebar-button">□</div>
+        <div class="titlebar-button">×</div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="sidebar-tab active" onclick="showSection('about')">O projekcie</div>
+      <div class="sidebar-tab" onclick="showSection('features')">Funkcje</div>
+      <div class="sidebar-tab" onclick="showSection('patcher')">Patcher</div>
+      <div class="sidebar-tab" onclick="showSection('download')">Pobierz</div>
+    </div>
+
+    <div class="content">
+      <div id="about" class="section active">
+        <h1>O projekcie GG-Retro</h1>
+
+        <p style="text-align: center; margin-bottom: 15px;">
+          <img src="/static/logo.png" alt="GG-Retro" style="max-width: 300px; height: auto;">
+        </p>
+
+        <p>Reimplementacja serwera protokołu Gadu-Gadu 6.0 w języku Rust. Projekt umożliwia uruchomienie własnego serwera kompatybilnego z oryginalnym klientem GG 6.0.</p>
+
+        <div class="info-box">
+          <strong>Status serwera:</strong> <span class="status-indicator"></span> Online<br>
+          <strong>Wersja:</strong> {{ version }}<br>
+          <strong>Użytkowników online:</strong> {{ online }}
+        </div>
+
+        <h2>Po co?</h2>
+        <p>Projekt powstał z nostalgii za latami 2000-tymi oraz chęci zachowania historii polskiego internetu. GG-Retro pozwala na:</p>
+        <ul>
+          <li>Uruchomienie prywatnego serwera GG dla przyjaciół</li>
+          <li>Testowanie starych wersji klienta Gadu-Gadu</li>
+          <li>Naukę protokołów komunikacyjnych</li>
+          <li>Zachowanie kawałka historii polskiego internetu</li>
+        </ul>
+
+        <h2>Licencja</h2>
+        <p>Projekt jest dostępny na licencji MIS. Kod źródłowy znajduje się na GitHub.</p>
+      </div>
+
+      <div id="features" class="section">
+        <h1>Funkcje serwera</h1>
+
+        <div class="feature-list">
+          <h2>Zaimplementowane:</h2>
+          <ul>
+            <li>Logowanie i rejestracja użytkowników</li>
+            <li>Wysyłanie i odbieranie wiadomości</li>
+            <li>Statusy online/offline/zajęty/niewidoczny</li>
+            <li>Kolejkowanie wiadomości offline</li>
+            <li>Formatowanie tekstu (pogrubienie, kursywa, podkreślenie, kolory)</li>
+            <li>Obsługa listy kontaktów</li>
+          </ul>
+
+          <h2>Szczegóły techniczne:</h2>
+          <ul>
+            <li>Baza danych SQLite z trybem WAL</li>
+            <li>Port 8074: Protokół GG (TCP)</li>
+            <li>Port 80: API HTTP (rejestracja, CAPTCHA, discovery)</li>
+            <li>Niskie zużycie zasobów</li>
+          </ul>
+
+          <h2>Czego brakuje:</h2>
+          <ul>
+            <li>Wysyłanie obrazków (GG 6.0 używa DCC)</li>
+            <li>Publiczny katalog użytkowników</li>
+            <li>Przypomnienie hasła (email)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="patcher" class="section">
+        <h1>Patcher GG.exe</h1>
+
+        <p>To narzędzie modyfikuje oryginalny plik wykonywalny Gadu-Gadu, aby łączył się z Twoim własnym serwerem zamiast oficjalnych serwerów GG.</p>
+
+        <div class="info-box">
+          <strong>Uwaga:</strong> Patcher działa tylko z oryginalnymi plikami GG 6.0. Upewnij się, że masz kopię zapasową!
+        </div>
+
+        <form id="patcherForm" onsubmit="return patchFile(event)">
+          <div class="form-group">
+            <label>1. Wybierz plik GG.exe:</label>
+            <input type="file" id="ggFile" accept=".exe" required>
+          </div>
+
+          <div class="form-group">
+            <label>2. Adres serwera (max 16 znaków):</label>
+            <input type="text" id="serverAddress" value="gg-retro.local" placeholder="np. gg.local" maxlength="16">
+          </div>
+
+          <button type="submit" class="button">Patchuj plik</button>
+        </form>
+
+        <div id="patcherStatus" style="margin-top: 15px;"></div>
+      </div>
+
+      <div id="download" class="section">
+        <h1>Pobierz klienta GG</h1>
+
+        <div class="feature-list">
+          <ul>
+            <li><a href="/static/gg61.exe">Gadu-Gadu 6.1</a> (mirror)</li>
+            <li><a href="https://www.dobreprogramy.pl/gadu-gadu-gg,program,windows,6628204058663041">Gadu-Gadu 6.0</a> (dobreprogramy.pl)</li>
+          </ul>
+        </div>
+
+        <div class="info-box">
+          <strong>SHA256:</strong><br>
+          <code style="font-size: 10px; word-break: break-all;">{{ gg61_sha256 }}</code>
+        </div>
+
+        <div class="info-box" style="background: #FFE0E0;">
+          <strong>Ważne:</strong> Pobrany klient GG wymaga patchowania! Oryginalny klient łączy się z oficjalnymi serwerami Gadu-Gadu. Użyj zakładki "Patcher" aby zmienić adres serwera na własny.
+        </div>
+
+        <h2>Dokumentacja</h2>
+        <ul>
+          <li><a href="https://github.com/macbury/gg-retro">Kod źródłowy (GitHub)</a></li>
+          <li><a href="https://libgadu.net/protocol/">Dokumentacja protokołu GG</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/main.js"></script>
+<script src="/static/patcher.js"></script>
+</body>
+</html>

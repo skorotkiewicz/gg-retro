@@ -1,0 +1,11 @@
+/target
+/dist
+*.db
+*.db-shm
+*.db-wal
+*.deb
+docs/libgadu/
+docs/miranda-ng/
+docs/kadu/
+.idea/**/*
+config.toml

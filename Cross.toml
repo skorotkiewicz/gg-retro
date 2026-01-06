@@ -1,0 +1,25 @@
+# Cross-compilation configuration for gg-retro
+# https://github.com/cross-rs/cross
+
+[build.env]
+passthrough = [
+    "SQLX_OFFLINE"
+]
+
+# AMD64 (x86_64)
+[target.x86_64-unknown-linux-gnu]
+image = "ghcr.io/cross-rs/x86_64-unknown-linux-gnu:main"
+
+# Raspberry Pi 64-bit (Pi 3/4/5 with 64-bit OS)
+[target.aarch64-unknown-linux-gnu]
+
+# Raspberry Pi 32-bit (Pi 2/3/4 with 32-bit OS)
+[target.armv7-unknown-linux-gnueabihf]
+
+# Windows 64-bit
+[target.x86_64-pc-windows-gnu]
+image = "ghcr.io/cross-rs/x86_64-pc-windows-gnu:main"
+
+# Windows 32-bit
+[target.i686-pc-windows-gnu]
+image = "ghcr.io/cross-rs/i686-pc-windows-gnu:main"

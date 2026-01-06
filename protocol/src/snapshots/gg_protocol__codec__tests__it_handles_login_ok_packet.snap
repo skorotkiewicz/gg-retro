@@ -1,0 +1,6 @@
+---
+source: protocol/src/codec.rs
+expression: output.to_vec()
+extension: packet
+snapshot_kind: binary
+---

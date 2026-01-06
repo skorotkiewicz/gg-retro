@@ -1,0 +1,39 @@
+<html>
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" style="overflow: hidden">
+<div id="ad222x33" style="width: 222px; height: 33px; border: 1px solid #CCCCCC; background-color: #F5F5F5; display: none; font-family: Arial, sans-serif;">
+  <div style="display: table; width: 100%; height: 100%;">
+    <div style="display: table-cell; vertical-align: middle; text-align: center; font-size: 12px; font-weight: bold; color: #666666;">gg-retro</div>
+  </div>
+</div>
+<div id="ad400x50" style="width: 400px; height: 50px; border: 1px solid #CCCCCC; background-color: #F5F5F5; display: none; font-family: Arial, sans-serif;">
+  <div style="display: table; width: 100%; height: 100%;">
+    <div style="display: table-cell; vertical-align: middle; text-align: center; font-size: 14px; font-weight: bold; color: #666666;">gg-retro</div>
+  </div>
+</div>
+<script language="javascript1.2">
+  function displayAd() {
+    var width = document.documentElement.clientWidth || document.body.clientWidth;
+    var height = document.documentElement.clientHeight || document.body.clientHeight;
+
+    var ad222 = document.getElementById('ad222x33');
+    var ad400 = document.getElementById('ad400x50');
+
+    ad222.style.display = 'none';
+    ad400.style.display = 'none';
+
+    if (width <= 222 && height <= 33) {
+      ad222.style.display = 'block';
+    } else if (width <= 400 && height <= 50) {
+      ad400.style.display = 'block';
+    } else if (height < 50) {
+      ad222.style.display = 'block';
+    } else {
+      ad400.style.display = 'block';
+    }
+  }
+
+  displayAd();
+  window.onresize = displayAd;
+</script>
+</body>
+</html>
